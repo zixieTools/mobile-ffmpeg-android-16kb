@@ -199,25 +199,25 @@ get_common_cflags() {
         local LTS_BUILD__FLAG="-DMOBILE_FFMPEG_LTS "
     fi
 
-    echo "-fno-integrated-as -fstrict-aliasing -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
+    echo "-fstrict-aliasing -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
 }
 
 get_arch_specific_cflags() {
     case ${ARCH} in
         arm-v7a)
-            echo "-target armv7-none-linux-androideabi -mfpu=vfpv3-d16 -mfloat-abi=softfp -DMOBILE_FFMPEG_ARM_V7A"
+            echo "-target armv7-none-linux-androideabi${API} -mfpu=vfpv3-d16 -mfloat-abi=softfp -DMOBILE_FFMPEG_ARM_V7A"
         ;;
         arm-v7a-neon)
-            echo "-target armv7-none-linux-androideabi -mfpu=neon -mfloat-abi=softfp -DMOBILE_FFMPEG_ARM_V7A_NEON"
+            echo "-target armv7-none-linux-androideabi${API} -mfpu=neon -mfloat-abi=softfp -DMOBILE_FFMPEG_ARM_V7A_NEON"
         ;;
         arm64-v8a)
-            echo "-target aarch64-none-linux-android -DMOBILE_FFMPEG_ARM64_V8A"
+            echo "-target aarch64-none-linux-android${API} -DMOBILE_FFMPEG_ARM64_V8A"
         ;;
         x86)
-            echo "-target i686-none-linux-android -mtune=intel -mssse3 -mfpmath=sse -m32 -DMOBILE_FFMPEG_X86"
+            echo "-target i686-none-linux-android${API} -mtune=intel -mssse3 -mfpmath=sse -m32 -DMOBILE_FFMPEG_X86"
         ;;
         x86-64)
-            echo "-target x86_64-none-linux-android -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
+            echo "-target x86_64-none-linux-android${API} -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
         ;;
     esac
 }
@@ -244,7 +244,7 @@ get_size_optimization_cflags() {
         arm64-v8a)
             case $1 in
                 ffmpeg)
-                    ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=gold -O2 -ffunction-sections -fdata-sections"
+                    ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=lld -O2 -ffunction-sections -fdata-sections"
                 ;;
                 *)
                     ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
@@ -384,7 +384,7 @@ get_size_optimization_ldflags() {
         arm64-v8a)
             case $1 in
                 ffmpeg)
-                    echo "-Wl,--gc-sections ${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=gold -O2 -ffunction-sections -fdata-sections -finline-functions"
+                    echo "-Wl,--gc-sections ${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=lld -O2 -ffunction-sections -fdata-sections -finline-functions"
                 ;;
                 *)
                     echo "-Wl,--gc-sections -Os -ffunction-sections -fdata-sections"
@@ -407,19 +407,19 @@ get_size_optimization_ldflags() {
 get_arch_specific_ldflags() {
     case ${ARCH} in
         arm-v7a)
-            echo "-target armv7-none-linux-androideabi -mfpu=vfpv3-d16 -mfloat-abi=softfp -Wl,--fix-cortex-a8"
+            echo "-target armv7-none-linux-androideabi${API} -mfpu=vfpv3-d16 -mfloat-abi=softfp -Wl,--fix-cortex-a8"
         ;;
         arm-v7a-neon)
-            echo "-target armv7-none-linux-androideabi -mfpu=neon -mfloat-abi=softfp -Wl,--fix-cortex-a8"
+            echo "-target armv7-none-linux-androideabi${API} -mfpu=neon -mfloat-abi=softfp -Wl,--fix-cortex-a8"
         ;;
         arm64-v8a)
-            echo "-target aarch64-none-linux-android"
+            echo "-target aarch64-none-linux-android${API}"
         ;;
         x86)
-            echo "-target i686-none-linux-android"
+            echo "-target i686-none-linux-android${API}"
         ;;
         x86-64)
-            echo "-target x86_64-none-linux-android"
+            echo "-target x86_64-none-linux-android${API}"
         ;;
     esac
 }

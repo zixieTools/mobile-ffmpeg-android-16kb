@@ -43,7 +43,7 @@ include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
 LOCAL_MODULE := mobileffmpeg_abidetect
 LOCAL_SRC_FILES := mobileffmpeg_abidetect.c
-LOCAL_CFLAGS := -Wall -Wextra -Werror -Wno-unused-parameter -DMOBILE_FFMPEG_${MY_ARCH_FLAGS}
+LOCAL_CFLAGS := -Wall -Wextra -Wno-unused-parameter -DMOBILE_FFMPEG_${MY_ARCH_FLAGS}
 LOCAL_C_INCLUDES := $(FFMPEG_INCLUDES)
 LOCAL_LDLIBS := -llog -lz -landroid
 LOCAL_STATIC_LIBRARIES := cpu-features
@@ -58,7 +58,7 @@ else
     MY_SRC_FILES := mobileffmpeg.c mobileffprobe.c mobileffmpeg_exception.c fftools_cmdutils.c fftools_ffmpeg.c fftools_ffprobe.c fftools_ffmpeg_opt.c fftools_ffmpeg_hw.c fftools_ffmpeg_filter.c
 endif
 
-MY_CFLAGS := -Wall -Werror -Wno-unused-parameter -Wno-switch -Wno-sign-compare
+MY_CFLAGS := -Wall -Wno-unused-parameter -Wno-switch -Wno-sign-compare
 MY_LDLIBS := -llog -lz -landroid
 
 MY_BUILD_GENERIC_MOBILE_FFMPEG := true
@@ -72,9 +72,6 @@ ifeq ($(MY_ARMV7_NEON), true)
     LOCAL_CFLAGS := $(MY_CFLAGS)
     LOCAL_LDLIBS := $(MY_LDLIBS)
     LOCAL_SHARED_LIBRARIES := libavcodec_neon libavfilter_neon libswscale_neon libavformat_neon libavutil_neon libswresample_neon libavdevice_neon
-    ifeq ($(APP_STL), c++_shared)
-        LOCAL_SHARED_LIBRARIES += c++_shared # otherwise NDK will not add the library for packaging
-    endif
     LOCAL_ARM_NEON := true
     include $(BUILD_SHARED_LIBRARY)
 
@@ -94,9 +91,6 @@ ifeq ($(MY_BUILD_GENERIC_MOBILE_FFMPEG), true)
     LOCAL_CFLAGS := $(MY_CFLAGS)
     LOCAL_LDLIBS := $(MY_LDLIBS)
     LOCAL_SHARED_LIBRARIES := libavfilter libavformat libavcodec libavutil libswresample libavdevice libswscale
-    ifeq ($(APP_STL), c++_shared)
-        LOCAL_SHARED_LIBRARIES += c++_shared # otherwise NDK will not add the library for packaging
-    endif
     LOCAL_ARM_NEON := ${MY_ARM_NEON}
     include $(BUILD_SHARED_LIBRARY)
 
