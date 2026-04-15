@@ -302,6 +302,9 @@ done
 
 LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib"
 
+# ADD CRT FILE DIRECTORY USING -B FLAG
+LDFLAGS+=" -B${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib/${BUILD_HOST}/${API}/"
+
 # LINKING WITH ANDROID LTS SUPPORT LIBRARY IS NECESSARY FOR API < 18
 if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ ${API} < 18 ]]; then
     LDFLAGS+=" -Wl,--whole-archive ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a -Wl,--no-whole-archive"

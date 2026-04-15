@@ -113,6 +113,7 @@ get_toolchain() {
     case ${HOST_ARCH} in
         i?86) HOST_ARCH=x86;;
         x86_64|amd64) HOST_ARCH=x86_64;;
+        arm64) HOST_ARCH=x86_64;;  # 对于arm64系统，使用x86_64的NDK工具链
     esac
 
     echo "${HOST_OS}-${HOST_ARCH}"
@@ -204,19 +205,19 @@ get_common_cflags() {
 get_arch_specific_cflags() {
     case ${ARCH} in
         arm-v7a)
-            echo "-march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=softfp -DMOBILE_FFMPEG_ARM_V7A"
+            echo "-target armv7-none-linux-androideabi -mfpu=vfpv3-d16 -mfloat-abi=softfp -DMOBILE_FFMPEG_ARM_V7A"
         ;;
         arm-v7a-neon)
-            echo "-march=armv7-a -mfpu=neon -mfloat-abi=softfp -DMOBILE_FFMPEG_ARM_V7A_NEON"
+            echo "-target armv7-none-linux-androideabi -mfpu=neon -mfloat-abi=softfp -DMOBILE_FFMPEG_ARM_V7A_NEON"
         ;;
         arm64-v8a)
-            echo "-march=armv8-a -DMOBILE_FFMPEG_ARM64_V8A"
+            echo "-target aarch64-none-linux-android -DMOBILE_FFMPEG_ARM64_V8A"
         ;;
         x86)
-            echo "-march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32 -DMOBILE_FFMPEG_X86"
+            echo "-target i686-none-linux-android -mtune=intel -mssse3 -mfpmath=sse -m32 -DMOBILE_FFMPEG_X86"
         ;;
         x86-64)
-            echo "-march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
+            echo "-target x86_64-none-linux-android -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
         ;;
     esac
 }
@@ -406,19 +407,19 @@ get_size_optimization_ldflags() {
 get_arch_specific_ldflags() {
     case ${ARCH} in
         arm-v7a)
-            echo "-march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=softfp -Wl,--fix-cortex-a8"
+            echo "-target armv7-none-linux-androideabi -mfpu=vfpv3-d16 -mfloat-abi=softfp -Wl,--fix-cortex-a8"
         ;;
         arm-v7a-neon)
-            echo "-march=armv7-a -mfpu=neon -mfloat-abi=softfp -Wl,--fix-cortex-a8"
+            echo "-target armv7-none-linux-androideabi -mfpu=neon -mfloat-abi=softfp -Wl,--fix-cortex-a8"
         ;;
         arm64-v8a)
-            echo "-march=armv8-a"
+            echo "-target aarch64-none-linux-android"
         ;;
         x86)
-            echo "-march=i686"
+            echo "-target i686-none-linux-android"
         ;;
         x86-64)
-            echo "-march=x86-64"
+            echo "-target x86_64-none-linux-android"
         ;;
     esac
 }
@@ -804,12 +805,12 @@ EOF
 }
 
 create_zlib_system_package_config() {
-    ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+    ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/include/zlib.h | grep -Eo '".*"' | sed -e 's/"//g')
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/zlib.pc" << EOF
 prefix=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr
 exec_prefix=\${prefix}
-libdir=${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib
+libdir=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib/${BUILD_HOST}/${API}
 includedir=\${prefix}/include
 
 Name: zlib
@@ -821,7 +822,6 @@ Libs: -L\${libdir} -lz
 Cflags: -I\${includedir}
 EOF
 }
-
 create_cpufeatures_package_config() {
     cat > "${INSTALL_PKG_CONFIG_DIR}/cpu-features.pc" << EOF
 prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/cpu-features
