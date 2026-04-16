@@ -214,10 +214,10 @@ get_arch_specific_cflags() {
             echo "-target aarch64-none-linux-android${API} -DMOBILE_FFMPEG_ARM64_V8A"
         ;;
         x86)
-            echo "-target i686-none-linux-android${API} -mtune=intel -mssse3 -mfpmath=sse -m32 -DMOBILE_FFMPEG_X86"
+            echo "-target i686-none-linux-android${API} -mtune=atom -mssse3 -mfpmath=sse -m32 -DMOBILE_FFMPEG_X86"
         ;;
         x86-64)
-            echo "-target x86_64-none-linux-android${API} -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
+            echo "-target x86_64-none-linux-android${API} -msse4.2 -mpopcnt -m64 -mtune=atom -DMOBILE_FFMPEG_X86_64"
         ;;
     esac
 }
@@ -884,14 +884,14 @@ set_toolchain_clang_paths() {
 
     BUILD_HOST=$(get_build_host)
     
-    export AR=${BUILD_HOST}-ar
+    export AR=llvm-ar
     export CC=$(get_clang_target_host)-clang
     export CXX=$(get_clang_target_host)-clang++
 
     if [ "$1" == "x264" ]; then
         export AS=${CC}
     else
-        export AS=${BUILD_HOST}-as
+        export AS=${CC}
     fi
 
     case ${ARCH} in
@@ -900,9 +900,9 @@ set_toolchain_clang_paths() {
         ;;
     esac
 
-    export LD=${BUILD_HOST}-ld
-    export RANLIB=${BUILD_HOST}-ranlib
-    export STRIP=${BUILD_HOST}-strip
+    export LD=ld.lld
+    export RANLIB=llvm-ranlib
+    export STRIP=llvm-strip
 
     export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/android-$(get_target_build)/pkgconfig"
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
@@ -937,5 +937,5 @@ build_android_lts_support() {
 
     # THEN BUILD FOR THIS ABI
     $(get_clang_target_host)-clang ${CFLAGS} -Wno-unused-command-line-argument -c ${BASEDIR}/android/app/src/main/cpp/android_lts_support.c -o ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o ${LDFLAGS} 1>>${BASEDIR}/build.log 2>&1
-    ${BUILD_HOST}-ar rcs ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o 1>>${BASEDIR}/build.log 2>&1
+    llvm-ar rcs ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o 1>>${BASEDIR}/build.log 2>&1
 }

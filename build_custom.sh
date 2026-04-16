@@ -110,15 +110,18 @@ parse_arguments() {
                 ;;
             --minimal)
                 # 最小构建：仅 arm64-v8a
+                BUILD_MODE="minimal"
                 BUILD_ARGS="$BUILD_ARGS --disable-arm-v7a --disable-x86 --disable-x86-64"
                 shift
                 ;;
             --standard)
                 # 标准构建：所有架构（除 arm-v7a-neon）
+                BUILD_MODE="standard"
                 shift
                 ;;
             --full)
                 # 完整构建：与标准相同，预留扩展
+                BUILD_MODE="full"
                 shift
                 ;;
             --disable-arch)
@@ -141,9 +144,12 @@ parse_arguments() {
     # 公共参数：所有模式都包含
     local COMMON_ARGS="--disable-arm-v7a-neon --enable-libpng --enable-openh264"
     
-    if [ -z "$BUILD_ARGS" ]; then
+    if [ -z "$BUILD_MODE" ]; then
+        BUILD_MODE="standard"
         log_info "未指定模式，使用默认标准配置"
     fi
+    
+    log_info "构建模式: $BUILD_MODE"
     
     # 合并公共参数和模式特有参数
     BUILD_ARGS="$COMMON_ARGS $BUILD_ARGS"
@@ -180,6 +186,10 @@ run_build() {
 # 主函数
 main() {
     log_info "=== MobileFFmpeg 自定义构建脚本 ==="
+    
+    # 切换到脚本所在目录
+    cd "$(dirname "$0")"
+    log_info "工作目录: $(pwd)"
     
     # 解析参数
     parse_arguments "$@"

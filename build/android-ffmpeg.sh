@@ -360,7 +360,6 @@ ${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' ${BASEDIR}
 ###################################################################
 
 ./configure \
-    --cross-prefix="${BUILD_HOST}-" \
     --sysroot="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot" \
     --prefix="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
@@ -369,6 +368,12 @@ ${SED_INLINE} 's/static int av_log_level/__thread int av_log_level/g' ${BASEDIR}
     --cpu="${TARGET_CPU}" \
     --cc="${CC}" \
     --cxx="${CXX}" \
+    --ar="${AR}" \
+    --as="${AS}" \
+    --nm="llvm-nm" \
+    --ranlib="${RANLIB}" \
+    --strip="${STRIP}" \
+    --ld="${CC}" \
     --extra-libs="$(pkg-config --libs --static cpu-features)" \
     --target-os=android \
     ${ARCH_OPTIONS} \
