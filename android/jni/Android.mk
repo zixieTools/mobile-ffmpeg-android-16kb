@@ -46,6 +46,7 @@ LOCAL_SRC_FILES := mobileffmpeg_abidetect.c
 LOCAL_CFLAGS := -Wall -Wextra -Wno-unused-parameter -DMOBILE_FFMPEG_${MY_ARCH_FLAGS}
 LOCAL_C_INCLUDES := $(FFMPEG_INCLUDES)
 LOCAL_LDLIBS := -llog -lz -landroid
+LOCAL_LDFLAGS := -Wl,-z,max-page-size=16384
 LOCAL_STATIC_LIBRARIES := cpu-features
 LOCAL_ARM_NEON := ${MY_ARM_NEON}
 include $(BUILD_SHARED_LIBRARY)
@@ -71,6 +72,7 @@ ifeq ($(MY_ARMV7_NEON), true)
     LOCAL_SRC_FILES := $(MY_SRC_FILES)
     LOCAL_CFLAGS := $(MY_CFLAGS)
     LOCAL_LDLIBS := $(MY_LDLIBS)
+    LOCAL_LDFLAGS := -Wl,-z,max-page-size=16384
     LOCAL_SHARED_LIBRARIES := libavcodec_neon libavfilter_neon libswscale_neon libavformat_neon libavutil_neon libswresample_neon libavdevice_neon
     LOCAL_ARM_NEON := true
     include $(BUILD_SHARED_LIBRARY)
@@ -90,6 +92,7 @@ ifeq ($(MY_BUILD_GENERIC_MOBILE_FFMPEG), true)
     LOCAL_SRC_FILES := $(MY_SRC_FILES)
     LOCAL_CFLAGS := $(MY_CFLAGS)
     LOCAL_LDLIBS := $(MY_LDLIBS)
+    LOCAL_LDFLAGS := -Wl,-z,max-page-size=16384
     LOCAL_SHARED_LIBRARIES := libavfilter libavformat libavcodec libavutil libswresample libavdevice libswscale
     LOCAL_ARM_NEON := ${MY_ARM_NEON}
     include $(BUILD_SHARED_LIBRARY)

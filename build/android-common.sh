@@ -433,7 +433,7 @@ get_ldflags() {
     fi
     local COMMON_LINKED_LIBS=$(get_common_linked_libraries $1)
 
-    echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS} -Wl,--hash-style=both -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a"
+    echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS} -Wl,--hash-style=both -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a -Wl,-z,max-page-size=16384"
 }
 
 create_chromaprint_package_config() {
